@@ -6,9 +6,11 @@
 #include <strsafe.h>
 #include "pwntools.h"
 
-proc_t *process(const CHAR buf[]) {
+proc_t *process(std::string progname) {
 	SECURITY_ATTRIBUTES saAttr;
-
+	
+	std::string cmd = "cmd.exe /c \"" + progname + "\""; 
+	
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
 	saAttr.bInheritHandle = TRUE;
 	saAttr.lpSecurityDescriptor = NULL;
@@ -21,7 +23,7 @@ proc_t *process(const CHAR buf[]) {
 	if (!SetHandleInformation(p->stdin_write, HANDLE_FLAG_INHERIT, 0)) exit(-4);
 
 	std::wstring w;
-	std::copy(buf, buf + strlen(buf), back_inserter(w));
+	std::copy(cmd.c_str(), cmd.c_str() + strlen(buf.c_str()), back_inserter(w));
 	spawn(p, (wchar_t *)w.c_str());
 
 	return p;
